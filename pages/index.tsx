@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '@/lib/supabaseClient'
 import type { User } from '@supabase/supabase-js'
+import Head from 'next/head'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,6 +27,12 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
+    // Demo credentials check first
+    if (email === 'user@table1837.com' && password === 'password123') {
+      router.push('/dashboard')
+      return
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -41,71 +48,82 @@ export default function LoginPage() {
         router.push('/dashboard')
       }
     } catch (err) {
-      setError('An unexpected error occurred')
+      setError('Invalid credentials. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="bg-black text-white min-h-screen">
-      <div className="login-bg min-h-screen flex items-center justify-center">
-        <div className="glass-panel p-8 rounded-lg w-full max-w-md mx-4">
+    <>
+      <Head>
+        <title>Table 1837 - Bar Management System</title>
+        <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+      </Head>
+      <div 
+        className="login-bg min-h-screen flex items-center justify-center"
+        style={{
+          fontFamily: 'EB Garamond, serif',
+          background: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.stockcake.com/public/f/3/c/f3cab94a-6edb-44f9-adf2-c82fa6e8b374_large/elegant-cocktail-evening-stockcake.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div 
+          className="glass-panel p-8 rounded-lg w-full max-w-md mx-4"
+          style={{
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}
+        >
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2">TABLE 1837</h1>
+            <h1 className="text-4xl font-bold mb-2 text-white">TABLE 1837</h1>
             <p className="text-gray-300 text-lg">Glen Rock Mill Inn</p>
             <p className="text-gray-400">Bar Management System</p>
           </div>
           
           <form onSubmit={handleLogin} className="space-y-6">
-            {error && (
-              <div className="bg-red-600 bg-opacity-20 border border-red-600 rounded-lg p-3 text-red-300">
-                {error}
-              </div>
-            )}
-            
             <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <input 
-                type="email" 
+              <label className="block text-sm font-medium mb-2 text-white">Username</label>
+              <input
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-black bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-green-600 text-white" 
-                placeholder="Enter your email" 
+                className="w-full px-4 py-3 bg-black bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-green-600 text-white"
+                placeholder="Enter your email"
                 required
-                disabled={loading}
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
-              <input 
-                type="password" 
+              <label className="block text-sm font-medium mb-2 text-white">Password</label>
+              <input
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-black bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-green-600 text-white" 
-                placeholder="Enter your password" 
+                className="w-full px-4 py-3 bg-black bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-green-600 text-white"
+                placeholder="Enter your password"
                 required
-                disabled={loading}
               />
             </div>
             
-            <button 
-              type="submit" 
+            {error && (
+              <div className="text-red-400 text-sm text-center">{error}</div>
+            )}
+            
+            <button
+              type="submit"
               disabled={loading}
-              className="w-full btn-primary py-3 px-6 rounded-lg font-semibold text-lg hover:bg-opacity-80 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-white py-3 px-6 rounded-lg font-semibold text-lg transition duration-300 disabled:opacity-50"
+              style={{
+                backgroundColor: '#1a3b1a',
+                borderColor: '#1a3b1a'
+              }}
             >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                'ACCESS INVENTORY SYSTEM'
-              )}
+              {loading ? 'Logging in...' : 'ACCESS INVENTORY SYSTEM'}
             </button>
             
             <div className="text-center text-sm text-gray-400">
@@ -115,6 +133,6 @@ export default function LoginPage() {
           </form>
         </div>
       </div>
-    </div>
+    </>
   )
 }
